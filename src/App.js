@@ -7,38 +7,40 @@ function App() {
   const [y1, setY1] = useState(0);
   const [x2, setX2] = useState(0);
   const [y2, setY2] = useState(0);
-  const [pointsBasic, setPointsBasic] = useState([]); 
-  const [pointsDDA, setPointsDDA] = useState([]); 
-  const [algorithm, setAlgorithm] = useState("basic"); 
+  const [pointsBasic, setPointsBasic] = useState([]);
+  const [pointsDDA, setPointsDDA] = useState([]);
+  const [algorithm, setAlgorithm] = useState("basic");
 
   const handleRun = () => {
     let newPointsBasic = [];
     let newPointsDDA = [];
 
     if (algorithm === "basic") {
-      const m = (y2 - y1) / (x2 - x1); 
-      let currentYB = y1; 
-      const deltaX = 1; 
+      const m = (y2 - y1) / (x2 - x1); // Gradien (slope)
+let currentYB = y1; // Start at y1
 
-      for (let x = x1; x <= x2; x = (parseFloat(x) + deltaX).toFixed(1)) {
-        const y = currentYB * deltaX + m; 
+// Menentukan arah pergerakan berdasarkan nilai x1 dan x2
+const deltaX = x1 < x2 ? 1 : -1; // Jika x1 lebih besar dari x2, kita mundur
 
-        newPointsBasic.push({
-          x: parseFloat(x).toFixed(1),
-          dx: deltaX,
-          currentYB: currentYB.toFixed(2), 
-          m: m.toFixed(2),
-          y: y.toFixed(2), 
-        });
+for (let x = x1; (deltaX > 0 ? x <= x2 : x >= x2); x += deltaX) {
+  newPointsBasic.push({
+    x: x.toFixed(1),
+    dx: deltaX,
+    currentYB: currentYB.toFixed(2), // y-coordinate
+    m: m.toFixed(2),
+    y: currentYB.toFixed(2), // Directly use currentYB for y
+  });
 
-        currentYB += m * deltaX; 
-      }
-      setPointsBasic(newPointsBasic);
+  // Update y based on the slope and deltaX
+  currentYB += m * deltaX;
+}
+
+setPointsBasic(newPointsBasic);
     } else if (algorithm === "dda") {
       // Algoritma DDA
       const dx = x2 - x1;
       const dy = y2 - y1;
-      const steps = Math.max(Math.abs(dx), Math.abs(dy)); 
+      const steps = Math.max(Math.abs(dx), Math.abs(dy));
       const incrementX = dx / steps;
       const incrementY = dy / steps;
 
@@ -47,14 +49,14 @@ function App() {
 
       for (let i = 0; i <= steps; i++) {
         newPointsDDA.push({
-          x: currentX.toFixed(1),
-          y: currentY.toFixed(1),
-          roundX: Math.round(currentX),
-          roundY: Math.round(currentY), 
+          x: currentX, // Biarkan nilai float
+          y: currentY, // Biarkan nilai float
+          roundX: Math.round(currentX), // Pembulatan X
+          roundY: Math.round(currentY), // Pembulatan Y
         });
 
-        currentX += incrementX; // 
-        currentY += incrementY; //
+        currentX += incrementX;
+        currentY += incrementY;
       }
       setPointsDDA(newPointsDDA);
     }
@@ -66,8 +68,8 @@ function App() {
     setX2(0);
     setY2(0);
     setPointsBasic([]);
-    setPointsDDA([]); 
-    setAlgorithm("basic"); 
+    setPointsDDA([]);
+    setAlgorithm("basic");
   };
 
   return (
